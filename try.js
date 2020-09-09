@@ -80,13 +80,13 @@ function UserProb(handle, tagname, rating){
 			return;
 		}
 		var pset = data.result.problems  //data["result"]["problems"]
-		if(pset.length==0){
+		if(pset.length == 0){
 			err_message("No such tag exists!");
 			return;
 		}
 		var ctr=1;
 		for(var i=0;i<pset.length;i++){
-			if(pset[i]["rating"]<=rating+200 && pset[i]["rating"] >= rating-50){
+			if(pset[i]["rating"] <= rating + 200 && pset[i]["rating"] >= rating - 50){
 				problems_div.innerHTML += ctr + ". " + pset[i]["name"] + "<br>";
 				ctr++;    
 			}
