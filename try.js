@@ -92,8 +92,9 @@ function UserProb(handle, tagname, rating){
 }
   
 function err_message(msg) {
-  alert(msg);
-  problems_div.innerHTML = '';
+	alert(msg);
+	problems_div.innerHTML = '';
+}
 
 document.getElementById('display_values').onclick = function () {
 	
