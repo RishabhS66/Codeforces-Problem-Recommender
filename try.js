@@ -1,6 +1,7 @@
-var api_url = "https://codeforces.com/api/";
-var prob="problemset.problems";
-var userinfo="user.info";
+const api_url = "https://codeforces.com/api/";
+const prob = "problemset.problems";
+const userinfo = "user.info";
+
 var handle_display_div = document.getElementById("handle_display");
 var recent_contests_div = document.getElementById("recent_contests"); 
 var problems_div = document.getElementById("problems");
@@ -38,9 +39,10 @@ document.getElementById('display_values').onclick = function () {
 			for(var i = data.result.length - 1; i >= Math.max(data.result.length - 5, 0); i--) {
 				recent_contests_div.innerHTML += data.result[i].contestName + " -> " + data.result[i].rank + "<br>";
 			}
+			// Since handle is valid, we recommend the user some problems
+			RecommendProb(handle_inp.value);
 		}
-		// Since handle is valid, we recommend the user some problems
-		RecommendProb(handle_inp.value);
+		
       
 		})
 	
@@ -55,44 +57,55 @@ document.getElementById('display_values').onclick = function () {
 
 function RecommendProb(user_handle){
 	var handle = user_handle;
-	console.log(user_handle);
 	var req3 = $.get(api_url + userinfo, {'handles': handle}, function(data, status) {
-		var status1=data["status"];
-		if(status!="success" || status1!="OK"){
+		var status1 = data["status"];
+		if(status != "success" || status1 != "OK"){
 			err_message("Get your net checked BRO!!");
 			return;
 		}
 		var heading = '<h2><u>Recommending problems for ' + handle + '</u></h2>';
 		problems_div.innerHTML = heading;
 		var userrating = data.result[0]["rating"];
+		
 		// Can do more with this function when all data present     
 		UserProb(handle, "greedy", userrating);
 	});
-	//problems_div.innerHTML = data["result"]["problems"][0]["contestId"]
 }
 
 function UserProb(handle, tagname, rating){
-	//console.log(rating);
 	var req2 = $.get(api_url + prob, {'tags': tagname}, function(data, status) {
-		var status1=data["status"];
-		if(status!="success" || status1!="OK"){
+		var status1 = data["status"];
+		if(status != "success" || status1 != "OK"){
 			err_message("Get your net checked BRO!!");
 			return;
 		}
-		var pset = data.result.problems  //data["result"]["problems"]
+		var pset = data.result.problems;
 		if(pset.length == 0){
 			err_message("No such tag exists!");
 			return;
 		}
-		var ctr=1;
-		for(var i=0;i<pset.length;i++){
-			if(pset[i]["rating"] <= rating + 200 && pset[i]["rating"] >= rating - 50){
-				problems_div.innerHTML += ctr + ". " + pset[i]["name"] + "<br>";
-				ctr++;    
+		var ctr = 1;
+		
+		var total_no_prob = pset.length;
+		var set_of_prob = new Set(); // To store and search the problems being recommended
+		var get_prob_url = "https://codeforces.com/contest/";
+		
+		// Generate five random problems
+		while(ctr <= Math.min(5, total_no_prob)){
+			
+			//Generate a random index
+			var idx = Math.floor(Math.random() * total_no_prob);
+			
+			if(!set_of_prob.has(idx) && pset[idx]["rating"] <= rating + 200 && pset[idx]["rating"] >= rating - 100){
+				var problem_url = get_prob_url + pset[idx].contestId.toString() + "/problem/" + pset[idx].index;
+				var problem_name = pset[idx].name;
+				problem_name = problem_name.link(problem_url);
+				problems_div.innerHTML += ctr + ". " + problem_name + " (" + pset[idx].rating + ")<br>";
+				set_of_prob.add(idx);
+				ctr++;
 			}
-			if(ctr > 15) 
-				break;
 		}
+		
 	});
 }
   
