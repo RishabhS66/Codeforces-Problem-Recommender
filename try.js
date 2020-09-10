@@ -1,7 +1,9 @@
 const api_url = "https://codeforces.com/api/";
 const prob = "problemset.problems";
 const userinfo = "user.info";
+
 var probsubmitted = "user.status";
+
 var handle_display_div = document.getElementById("handle_display");
 var recent_contests_div = document.getElementById("recent_contests"); 
 var problems_div = document.getElementById("problems");
@@ -14,12 +16,13 @@ input.addEventListener("keyup", function(event) {
 		event.preventDefault();
 		// Trigger the button element with a click
 
-	// Clear any data present before
-	handle_display_div.innerHTML = '';
+    // Clear any data present before
+	  handle_display_div.innerHTML = '';
     recent_contests_div.innerHTML = '';
     problems_div.innerHTML='';  
     document.getElementById("display_values").click();
-	}
+
+  }
 });
 
 // With this request, we get all the rating changes of the user
@@ -27,11 +30,11 @@ document.getElementById('display_values').onclick = function () {
   
 	var handle_inp = document.getElementById("handle_inp");
 	//Clear data of previous handle, if present
-	handle_display_div.innerHTML = '';
+	  handle_display_div.innerHTML = '';
   	recent_contests_div.innerHTML = '';
   	problems_div.innerHTML='';
     var req = $.get(api_url + "user.rating", { 'handle': handle_inp.value })
-  
+ 
 		.done(function(data){
 		var heading = '<h2><u>Showing statistics for ' + handle_inp.value + '</u></h2>';
 		handle_display_div.innerHTML = heading;
@@ -167,6 +170,7 @@ function UserProb(handle, tagname, rating, usersubmits){
     		UserProb(handle, tagname, rating, usersubmits)
   		});
 } 
+
 function err_message(msg) {
 	alert(msg);
 	problems_div.innerHTML = '';
