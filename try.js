@@ -66,10 +66,10 @@ function RecommendProb(user_handle){
 		var heading = '<h2><u>Recommending problems for ' + handle + '</u></h2>';
 		problems_div.innerHTML = heading;
 		var userrating = data.result[0]["rating"];
+		
 		// Can do more with this function when all data present     
 		UserProb(handle, "greedy", userrating);
 	});
-	//problems_div.innerHTML = data["result"]["problems"][0]["contestId"]
 }
 
 function UserProb(handle, tagname, rating){
@@ -79,7 +79,7 @@ function UserProb(handle, tagname, rating){
 			err_message("Get your net checked BRO!!");
 			return;
 		}
-		var pset = data.result.problems;  //data["result"]["problems"]
+		var pset = data.result.problems;
 		if(pset.length == 0){
 			err_message("No such tag exists!");
 			return;
@@ -87,11 +87,15 @@ function UserProb(handle, tagname, rating){
 		var ctr = 1;
 		
 		var total_no_prob = pset.length;
-		var set_of_prob = new Set();
+		var set_of_prob = new Set(); // To store and search the problems being recommended
 		var get_prob_url = "https://codeforces.com/contest/";
 		
-		while(ctr <= 5){
+		// Generate five random problems
+		while(ctr <= Math.min(5, total_no_prob)){
+			
+			//Generate a random index
 			var idx = Math.floor(Math.random() * total_no_prob);
+			
 			if(!set_of_prob.has(idx) && pset[idx]["rating"] <= rating + 200 && pset[idx]["rating"] >= rating - 100){
 				var problem_url = get_prob_url + pset[idx].contestId.toString() + "/problem/" + pset[idx].index;
 				var problem_name = pset[idx].name;
