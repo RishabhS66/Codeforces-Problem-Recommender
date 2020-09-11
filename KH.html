@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codeforces Analyzer</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- <script src="khagesh.js"></script> -->
+    <link rel="stylesheet" href="master.css">
+</head>
+<body>
+    <div class="container head">
+        <h2>Codeforces Analyzer</h2>
+        <div class="row handleblock">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4 form-group">
+                <input type="text" class="form-control" placeholder="Enter Codeforces handle" id="handle_inp">
+            </div>
+            <div class="col-sm-2"><button type="submit" class="btn btn-primary" id="display_values">Go</button></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- <label for = "handle_inp">Enter your Codeforces handle:</label><br><br> -->
+        <!-- <input type = "text" id = "handle_inp"><br><br> -->
+
+        <!-- <input type = "button" id = "display_values" value = "Go!"><br> -->
+
+        <div id = "handle_display"></div>
+        <div id = "rank_display"></div>
+        <div id = "recent_contests"></div>
+
+        <div id = "problems"></div>
+    </div>
+
+    <div class="container" id="block">
+        <h3>Your Contests</h3>
+        <ul class="list-group list-group-flush" id="contestlist">
+
+            <li class="list-group-item">
+                
+            </li>
+
+        </ul>
+    </div>
+
+    
+    <script src="khagesh.js"></script>
+</body>
+</html>
