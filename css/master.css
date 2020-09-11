@@ -1,0 +1,16 @@
+.head{
+    margin-top: 10px;
+    background-color: #D8D6D5;
+}
+.head h2{
+    color: green;
+}
+
+.handleblock{
+    margin: 1em;
+}   
+
+#block{
+    margin-top: 20px;
+    display: none;
+}
