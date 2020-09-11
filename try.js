@@ -1,13 +1,12 @@
 const api_url = "https://codeforces.com/api/";
 const prob = "problemset.problems";
 const userinfo = "user.info";
-
-var probsubmitted = "user.status";
-
+const probsubmitted = "user.status";
 var handle_display_div = document.getElementById("handle_display");
 var recent_contests_div = document.getElementById("recent_contests"); 
 var problems_div = document.getElementById("problems");
 var input = document.getElementById("handle_inp");
+var rating=  document.getElementById("rank_display");
 
 input.addEventListener("keyup", function(event) {
 	// Number 13 is the "Enter" key on the keyboard
@@ -16,13 +15,12 @@ input.addEventListener("keyup", function(event) {
 		event.preventDefault();
 		// Trigger the button element with a click
 
-    // Clear any data present before
-	  handle_display_div.innerHTML = '';
-    recent_contests_div.innerHTML = '';
-    problems_div.innerHTML='';  
-    document.getElementById("display_values").click();
-
-  }
+		// Clear any data present before
+		handle_display_div.innerHTML = '';
+	    recent_contests_div.innerHTML = '';
+	    problems_div.innerHTML='';  
+	    document.getElementById("display_values").click();
+	}
 });
 
 // With this request, we get all the rating changes of the user
@@ -30,11 +28,11 @@ document.getElementById('display_values').onclick = function () {
   
 	var handle_inp = document.getElementById("handle_inp");
 	//Clear data of previous handle, if present
-	  handle_display_div.innerHTML = '';
+	handle_display_div.innerHTML = '';
   	recent_contests_div.innerHTML = '';
   	problems_div.innerHTML='';
     var req = $.get(api_url + "user.rating", { 'handle': handle_inp.value })
- 
+  
 		.done(function(data){
 		var heading = '<h2><u>Showing statistics for ' + handle_inp.value + '</u></h2>';
 		handle_display_div.innerHTML = heading;
@@ -100,10 +98,14 @@ function tags_n_ratings(handle, ptags, user_prob_set){
 	      	return;
 	    }
 	    // Gets user rating
-	    var userrating = data.result[0]["rating"];
+	    var curr_rating=data.result[0]["rating"];
+      	var curr_rank=data.result[0]["rank"];
+      	var maxRating=data.result[0]["maxRating"];
+       rating.innerHTML = '';
+       rating.innerHTML+="<h3><a>Current Rating: <a/>"+"<violet>"+curr_rating+"<violet/>"+"<br/><a>  Max Rating: <a/>"+maxRating+"<br/>Current Rank: "+curr_rank+"<h3/>";
 	    // Recommend problems of certain tag
 	    for(var i in ptags){
-	    	UserProb(handle, ptags[i], userrating, user_prob_set);
+	    	UserProb(handle, ptags[i], curr_rating, user_prob_set);
 	    }
   	});
 }
@@ -167,10 +169,11 @@ function UserProb(handle, tagname, rating, usersubmits){
   		})
   		.fail(function(data, status){
   			// If it fails due to too frequent calls to the API (error 429), again call it
-    		UserProb(handle, tagname, rating, usersubmits)
+  			// Use the commented line only when in production :p
+  			//console.clear();
+  			UserProb(handle, tagname, rating, usersubmits)
   		});
 } 
-
 function err_message(msg) {
 	alert(msg);
 	problems_div.innerHTML = '';
