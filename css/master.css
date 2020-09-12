@@ -1,0 +1,40 @@
+.head{
+    margin-top: 10px;
+    background-color: #D8D6D5;
+}
+.head h2{
+    color: green;
+}
+
+.handleblock{
+    margin: 1em;
+}   
+
+#block{
+    margin-top: 20px;
+    /*display: none;*/
+}
+
+.recent{
+    height: 100%;
+}
+
+#display_block{
+    display: none;
+}
+
+.accepted{
+    color: green;
+}
+
+.failed{
+    color: red;
+}
+
+.accepted, .failed, .notattempted{
+    font-size: 10px;
+}
+
+tr{
+    height: 10px;
+}
