@@ -15,7 +15,7 @@
 </head>
 <body>
     <div class="container head">
-        <h2>Codeforces Analyzer</h2>
+        <h2 class="text-center codeforces">Codeforces Analyzer</h2>
         <div class="row handleblock">
             <div class="col-sm-4"></div>
             <div class="col-sm-4 form-group">
@@ -25,13 +25,23 @@
         </div>
     </div>
 
+    <div class="container text-center" id="alert_message">Handle does not exist!</div>
+
     <div class="container" id="display_block">
         <div class="row">
             <div class="col-sm-6">
                 <div class="container">
-                    <div id = "handle_display"></div>
-                    <div id = "rank_display"></div>
-                    <div id = "recent_contests"></div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div>Statistics for<p id = "handle_display"></p></div>
+                            <div>Current Ratings: <p id = "rank_display"></p></div>
+                            <div>Max Ratings: <p id = "max_rating_display"></p></div>
+                            <div>Current Rank: <p id = "current_rank_display"></p></div>
+                            <div id = "recent_contests"></div>
+                            <div>Contests: <p id="contest_display"></p></div>
+                        </div>
+                    </div>
+                    <!-- <div id = "recent_contests"></div> -->
                     <div id = "problems"></div>
                 </div>
             </div>

@@ -2,8 +2,10 @@
     margin-top: 10px;
     background-color: #D8D6D5;
 }
+
 .head h2{
-    color: green;
+    color: #0c225e;
+    font-size: 35px;
 }
 
 .handleblock{
@@ -37,4 +39,13 @@
 
 tr{
     height: 10px;
+}
+
+.recommend{
+    font-size: 20px;
+}
+
+#alert_message{
+    display: none;
+    color: red;
 }

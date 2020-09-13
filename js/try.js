@@ -8,9 +8,10 @@ var handle_display_div = 'none';
 var recent_contests_div = 'none';
 var problems_div = 'none';
 var rating=  'none';
-var input = 'none';
+var input;
 var ptags=[];
 var handle = 'none';
+var total_contest_div;
 
 function init(){
     handle_display_div = document.getElementById("handle_display");
@@ -18,6 +19,7 @@ function init(){
     problems_div = document.getElementById("problems");
     rating=  document.getElementById("rank_display");
     input = document.getElementById("handle_inp");
+    total_contest_div = document.getElementById("contest_display");
 
     input.addEventListener("keyup", function(event) {
         // Number 13 is the "Enter" key on the keyboard
@@ -27,9 +29,9 @@ function init(){
         // Trigger the button element with a click
 
         // Clear any data present before
-        handle_display_div.innerHTML = '';
-        recent_contests_div.innerHTML = '';
-        problems_div.innerHTML='';  
+        //handle_display_div.innerHTML = '';
+        //recent_contests_div.innerHTML = '';
+        //problems_div.innerHTML='';  
         //document.getElementById("display_values").click();
         $('#display_values').click();
         }
@@ -169,6 +171,10 @@ var req4 = $.get(api_url + userinfo, {'handles': handle})
         var maxRating=data.result[0]["maxRating"];
         rating.innerHTML = '';
         rating.innerHTML+="<h3><a>Current Rating: <a/>"+"<violet>"+curr_rating+"<violet/>"+"<br/><a>  Max Rating: <a/>"+maxRating+"<br/>Current Rank: "+curr_rank+"<h3/>";
+        //documents.getElementById("max_rating_display").innerHTML = maxRating;
+        //documents.getElementById("current_rank_display").innerHTML = curr_rank;
+        $('#max_rating_display').text(maxRating);
+        $('#current_rank_display').text(curr_rank);
         // Recommend problems of certain tag
         for(var i in ptags){
             UserProb(handle, ptags[i], curr_rating, user_prob_set);
@@ -225,7 +231,7 @@ function UserProb(handle, tagname, rating, usersubmits){
             if(!set_of_prob.has(idx) && pset[idx]["rating"] <= rating + 200 && pset[idx]["rating"] >= rating - 100){
             if(ctr==1){
                 // Only print the heading if at least 1 problem of that rating is found in the problemset!
-                var heading = '<h2><u>Recommended problems for ' + handle + ' under <em>' + tagname + '</em> tag : </u></h2>';
+                var heading = '<h2 class="recommend"><u>Recommended problems for ' + handle + ' under <em>' + tagname + '</em> tag : </u></h2>';
                 problems_div.innerHTML += heading;
             }
             var problem_url = get_prob_url + pset[idx].contestId.toString() + "/problem/" + pset[idx].index;
@@ -245,6 +251,15 @@ function UserProb(handle, tagname, rating, usersubmits){
     });
 } 
 
+function clear_all(){
+    handle_display_div.innerHTML = '';
+    recent_contests_div.innerHTML = '';
+    handle_inp.value = '';
+    problems_div.innerHTML='';
+    total_contest_div.innerHTML = '';
+    document.getElementById("block").innerHTML = "";
+}
+
 //-------------------------------------------------Jquery---------------------------------------------------------
 
 $(document).ready(function (){
@@ -256,20 +271,19 @@ $(document).ready(function (){
         handle = $('#handle_inp').val()
         user_rating = $.get(api_url + "user.rating", {'handle':handle})
         .done(function(data,status){
+            $('#alert_message').hide();
             //console.log(data.result[0])
-            var heading = '<h2><u>Showing statistics for ' + handle_inp.value + '</u></h2>';
-            handle_display_div.innerHTML = heading;
+            handle_display_div.innerHTML = handle_inp.value;
+            
                     
             if(data.result.length == 0) {
               recent_contests_div.innerHTML = "User has yet to participate in a contest!";
             }              
             else {            
-              recent_contests_div.innerHTML = '<h3>Recent contests: </h3>';                    
-              for(var i = data.result.length - 1; i >= Math.max(data.result.length - 5, 0); i--) {
-                recent_contests_div.innerHTML += data.result[i].contestName + " -> " + data.result[i].rank + "<br>";
-              }
-              // Since handle is valid, we recommend the user some problems
-              RecommendProb(handle_inp.value);
+                //$('#contest_display').text = data.result.length
+                total_contest_div.innerHTML = data.result.length
+                // Since handle is valid, we recommend the user some problems
+                RecommendProb(handle_inp.value);
             }
 
             contest_list = data.result.reverse()
@@ -277,12 +291,10 @@ $(document).ready(function (){
             $('#display_block').show();
         })
         .fail(function(data,status){
-            alert("Handle: "+handle+", does not exist!")
-            $('#block').hide();
-            handle_display_div.innerHTML = '';
-            recent_contests_div.innerHTML = '';
-            handle_inp.value = '';
-            problems_div.innerHTML='';
+            $('#display_block').hide();
+            $('#alert_message').show();
+            //clear_all();
+            //alert("Handle: "+handle+", does not exist!")
         })
     });
 });
