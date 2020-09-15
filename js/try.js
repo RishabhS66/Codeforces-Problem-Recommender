@@ -10,6 +10,7 @@ var problems_div = 'none';
 var rating=  'none';
 var input;
 var ptags=[];
+var levels=[];
 var handle = 'none';
 var total_contest_div;
 
@@ -146,10 +147,10 @@ function RecommendProb(user_handle){
             user_prob_set.push(res[i].problem.contestId + "_" + res[i].problem.name); // Array of attempted problems, with problems defined as 'contestId + NameOfProb'
             var probtag  = res[i].problem.tags; // All tags associated with the problem
             for(var t =0; t<probtag.length; t++){
-            if(!ptags.includes(probtag[t])) ptags.push(probtag[t]); // Array containing unique tags 
+            if(!ptags.includes(probtag[t])) ptags.push(probtag[t]); // Array containing unique tags attempted by the user. 
             }
         }
-
+       
         tags_n_ratings(handle, ptags, user_prob_set);
     });
 }
@@ -175,10 +176,19 @@ var req4 = $.get(api_url + userinfo, {'handles': handle})
         //documents.getElementById("current_rank_display").innerHTML = curr_rank;
         $('#max_rating_display').text(maxRating);
         $('#current_rank_display').text(curr_rank);
-        // Recommend problems of certain tag
-        for(var i in ptags){
-            UserProb(handle, ptags[i], curr_rating, user_prob_set);
+        
+  // if the user is new, we define beginner tags and give him a current rating of 800 to give problems 
+        if(ptags.length==0)
+        {
+            ptags=["math","greedy","sortings","brute force","implementation"];
+            curr_rating =800;
         }
+
+            EMH(handle,curr_rating, user_prob_set);
+        // Recommend problems of certain tag
+        /*for(var i in ptags){
+            UserProb(handle, ptags[i], curr_rating, user_prob_set);
+        }*/
     })
     .fail(function(data, status){
         // If it fails due to too frequent calls to the API (error 429), again call it
@@ -220,7 +230,7 @@ function UserProb(handle, tagname, rating, usersubmits){
         
         // Generate five random problems
         var checks=0;
-        while(ctr <= Math.min(5, total_no_prob)){
+        while(ctr <= Math.min(2, total_no_prob)){
             checks+=1;
             // Sometimes, there may not be even 5 problems with the desired rating requirement, so we have to break the loop forcefully
             if(checks>1000*total_no_prob){
@@ -260,6 +270,108 @@ function clear_all(){
     document.getElementById("block").innerHTML = "";
 }
 
+
+
+function EMH(handle, rating, usersubmits){
+    // Function to print recommended problems of all tags
+    var req2 = $.get(api_url + prob, {'tags':""})
+    .done(function(data, status) {
+        var status1 = data["status"];
+        if(status != "success" || status1 != "OK"){
+            err_message("Get your net checked BRO!!");
+            return;
+        }
+        var pset = data.result.problems;
+        // A precautionary check, since we only pass those tags which the user has attempted, thus being sure that the tag itself exists!
+        if(pset.length == 0){
+        err_message("No Recommendations");
+            return;
+        }
+       // var pset = data.result.problems //data["result"]["problems"]
+        
+        var total_no_prob = Math.min(1000,pset.length);
+        var set_of_prob = new Set(); // To store and search the problems being recommended
+        var get_prob_url = "https://codeforces.com/contest/";
+        var not_attempted_prob = [];
+        
+        // Creates array of problems, of the tag provided in input, NOT attempted by the user
+        for(var i =0; i<total_no_prob; i++){
+            if(!usersubmits.includes(pset[i].contestId + "_" + pset[i].name)) not_attempted_prob.push(pset[i]);
+        }
+
+        pset = not_attempted_prob; // Modifies pset to contain only those problems NOT attempted by the user
+        total_no_prob = pset.length;
+       
+        level=["Easy","Med","Hard"];
+
+
+        for(var index in level)
+        {
+            var low,high;
+            if (index==0)
+            {
+                low=rating-100;
+                high=rating+150;
+            }
+            else if(index==1)
+            {
+                low= rating +100;
+                high=rating +500;
+            }
+            else
+            {
+                low= rating +800;
+                high=3500;
+            }
+
+                    // Generate five random problems
+        var checks=0;
+
+        var ctr = 1;
+    
+        while(ctr <= Math.min(2, total_no_prob)){
+            checks+=1;
+            // Sometimes, there may not be even 2 problems with the desired rating requirement, so we have to break the loop forcefully
+            if(checks>1000*total_no_prob){
+            break;
+        }
+            //Generate a random index
+            var idx = Math.floor(Math.random() * total_no_prob);
+            if(!set_of_prob.has(idx) && pset[idx]["rating"] <= high && pset[idx]["rating"] >= low){
+            if(ctr==1){
+                // Only print the heading if at least 1 problem of that rating is found in the problemset!
+                var heading = '<h2 class="recommend"><u>Recommended problems for ' + handle + ' under <em>' + level[index] + '</em> level : </u></h2>';
+                problems_div.innerHTML += heading;
+            }
+            var problem_url = get_prob_url + pset[idx].contestId.toString() + "/problem/" + pset[idx].index;
+            var problem_name = pset[idx].name;
+            problem_name = problem_name.link(problem_url);
+            problems_div.innerHTML += ctr + ". " + problem_name + " (" + pset[idx].rating + ")<br>";
+            set_of_prob.add(idx);
+            ctr++;
+        }
+        }
+
+
+
+        }
+
+
+    
+    })
+    .fail(function(data, status){
+        // If it fails due to too frequent calls to the API (error 429), again call it
+        //console.clear();
+        EMH(handle, rating, usersubmits)
+    });
+} 
+
+
+
+
+
+
+
 //-------------------------------------------------Jquery---------------------------------------------------------
 
 $(document).ready(function (){
@@ -278,6 +390,9 @@ $(document).ready(function (){
                     
             if(data.result.length == 0) {
               recent_contests_div.innerHTML = "User has yet to participate in a contest!";
+             //  Recommend Problems for new user
+                       RecommendProb(handle_inp.value);
+         
             }              
             else {            
                 //$('#contest_display').text = data.result.length
