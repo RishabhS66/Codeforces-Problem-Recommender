@@ -13,6 +13,19 @@ var ptags=[];
 var levels=[];
 var handle = 'none';
 var total_contest_div;
+var estimated_rating = 0;
+// Vars for charts
+var tags = {};
+google.charts.load('current', { 'packages': ['corechart', 'calendar'] });
+var titleTextStyle = {
+    fontSize: 18,
+    color: '#393939',
+    bold: false
+ };
+var colors = ['#f44336', '#E91E63', '#9C27B0', '#673AB7', '#2196F3', '#009688',
+    '#8BC34A', '#CDDC39', '#FFC107', '#FF9800', '#FF5722', '#795548', '#607D8B', '#E65100',
+    '#827717', '#004D40', '#1A237E', '#6200EA', '#3F51B5', '#F50057', '#304FFE', '#b71c1c'];
+var elem1;
 
 function init(){
     handle_display_div = document.getElementById("handle_display");
@@ -21,6 +34,8 @@ function init(){
     rating=  document.getElementById("rank_display");
     input = document.getElementById("handle_inp");
     total_contest_div = document.getElementById("contest_display");
+    estimated_rating = 0;
+    elem1 = document.getElementById("demo")
 
     input.addEventListener("keyup", function(event) {
         // Number 13 is the "Enter" key on the keyboard
@@ -30,9 +45,9 @@ function init(){
         // Trigger the button element with a click
 
         // Clear any data present before
-        //handle_display_div.innerHTML = '';
-        //recent_contests_div.innerHTML = '';
-        //problems_div.innerHTML='';  
+        handle_display_div.innerHTML = '';
+        recent_contests_div.innerHTML = '';
+        problems_div.innerHTML='';  
         //document.getElementById("display_values").click();
         $('#display_values').click();
         }
@@ -110,7 +125,7 @@ function display_contest_list(){
     var x,count = 0;
     $('#contestlist *').remove()
     for (x of contest_list){
-        //if(++count>5)   break;
+        if(++count>5)   break;
         $('#contestlist').append('<div class="card">'+
                                     '<div class="card-body">'+
                                         '<h4><a href="https://codeforces.com/contest/'+x.contestId+'">'+x.contestName+'</a></h4>'+
@@ -144,15 +159,54 @@ function RecommendProb(user_handle){
         }
         var res = data.result;
         for(var i=0;i<res.length;i++){
+            if(user_prob_set.includes(res[i].problem.contestId + "_" + res[i].problem.name))    continue;
             user_prob_set.push(res[i].problem.contestId + "_" + res[i].problem.name); // Array of attempted problems, with problems defined as 'contestId + NameOfProb'
             var probtag  = res[i].problem.tags; // All tags associated with the problem
             for(var t =0; t<probtag.length; t++){
-            if(!ptags.includes(probtag[t])) ptags.push(probtag[t]); // Array containing unique tags attempted by the user. 
+                if(!ptags.includes(probtag[t])) ptags.push(probtag[t]); // Array containing unique tags attempted by the user. 
+                //  Tags of accepted problem
+                if (res[i].verdict == 'OK'){
+                    if(probtag[t]=="combinatorics"){
+                        console.log(res[i].problem.name+":"+i)
+                    }
+                    if (tags[probtag[t]] === undefined) tags[probtag[t]] = 1;
+                    else tags[probtag[t]]++;
+                    /*
+                    probtag.forEach(function (t1) {
+                        
+                    });
+                    */
+                }
             }
+        }
+        if (typeof google.visualization === 'undefined') {
+            google.charts.setOnLoadCallback(drawCharts);
+        } else {
+            drawCharts();
         }
        
         tags_n_ratings(handle, ptags, user_prob_set);
     });
+
+    //Charts
+    /*
+    for (var i = data.result.length - 1; i >= 0; i--) {
+        var sub = data.result[i];
+        var problemId = sub.problem.contestId + '-' + sub.problem.index;
+
+        if (sub.verdict == 'OK') {
+            // This is probably no entirely correct. because for multiple ac tag count will increase every time
+            sub.problem.tags.forEach(function (t) {
+                if (tags[t] === undefined) tags[t] = 1;
+                else tags[t]++;
+            });
+        }
+    }
+    for (var tag in tags) {
+        // elem1.innerHTML += tag + "<br/>";
+        console.log(tags[tag]);
+    }
+    */
 }
 
 function tags_n_ratings(handle, ptags, user_prob_set){
@@ -171,17 +225,19 @@ var req4 = $.get(api_url + userinfo, {'handles': handle})
         var curr_rank=data.result[0]["rank"];
         var maxRating=data.result[0]["maxRating"];
         rating.innerHTML = '';
-        rating.innerHTML+="<h3><a>Current Rating: <a/>"+"<violet>"+curr_rating+"<violet/>"+"<br/><a>  Max Rating: <a/>"+maxRating+"<br/>Current Rank: "+curr_rank+"<h3/>";
+        //rating.innerHTML+="<h3><a>Current Rating: <a/>"+"<violet>"+curr_rating+"<violet/>"+"<br/><a>  Max Rating: <a/>"+maxRating+"<br/>Current Rank: "+curr_rank+"<h3/>";
         //documents.getElementById("max_rating_display").innerHTML = maxRating;
         //documents.getElementById("current_rank_display").innerHTML = curr_rank;
+        $('#rank_display').text(curr_rating)
         $('#max_rating_display').text(maxRating);
         $('#current_rank_display').text(curr_rank);
         
   // if the user is new, we define beginner tags and give him a current rating of 800 to give problems 
-        if(ptags.length==0)
+        if(ptags.length==0 || curr_rating<800)
         {
             ptags=["math","greedy","sortings","brute force","implementation"];
             curr_rating =800;
+            estimated_rating = 800;
         }
 
             EMH(handle,curr_rating, user_prob_set);
@@ -302,26 +358,33 @@ function EMH(handle, rating, usersubmits){
         pset = not_attempted_prob; // Modifies pset to contain only those problems NOT attempted by the user
         total_no_prob = pset.length;
        
-        level=["Easy","Med","Hard"];
+        level=["Easy","Medium","Hard"];
 
+        var round_rating = estimated_rating%100
+        if(round_rating<50){
+            round_rating = estimated_rating-round_rating;
+        }else{
+            round_rating = estimated_rating+100-round_rating;
+        }
+        console.log(estimated_rating)
 
         for(var index in level)
         {
             var low,high;
             if (index==0)
             {
-                low=rating-100;
-                high=rating+150;
+                low=round_rating-100;
+                high=round_rating+100;
             }
             else if(index==1)
             {
-                low= rating +100;
-                high=rating +500;
+                low= round_rating +101;
+                high=round_rating +300;
             }
             else
             {
-                low= rating +800;
-                high=3500;
+                low= round_rating +301;
+                high=round_rating +500;
             }
 
                     // Generate five random problems
@@ -329,7 +392,7 @@ function EMH(handle, rating, usersubmits){
 
         var ctr = 1;
     
-        while(ctr <= Math.min(2, total_no_prob)){
+        while(ctr <= Math.min(3, total_no_prob)){
             checks+=1;
             // Sometimes, there may not be even 2 problems with the desired rating requirement, so we have to break the loop forcefully
             if(checks>1000*total_no_prob){
@@ -340,7 +403,7 @@ function EMH(handle, rating, usersubmits){
             if(!set_of_prob.has(idx) && pset[idx]["rating"] <= high && pset[idx]["rating"] >= low){
             if(ctr==1){
                 // Only print the heading if at least 1 problem of that rating is found in the problemset!
-                var heading = '<h2 class="recommend"><u>Recommended problems for ' + handle + ' under <em>' + level[index] + '</em> level : </u></h2>';
+                var heading = '<h2 class="recommend"><u><em>' + level[index] + '</em> problems recommended for ' + handle + ' : </u></h2>';
                 problems_div.innerHTML += heading;
             }
             var problem_url = get_prob_url + pset[idx].contestId.toString() + "/problem/" + pset[idx].index;
@@ -381,6 +444,8 @@ $(document).ready(function (){
         
         //alert('HTML: '+$('#handle').val())
         handle = $('#handle_inp').val()
+        estimated_rating = 0
+        tags = {}
         user_rating = $.get(api_url + "user.rating", {'handle':handle})
         .done(function(data,status){
             $('#alert_message').hide();
@@ -402,6 +467,13 @@ $(document).ready(function (){
             }
 
             contest_list = data.result.reverse()
+            for(var i=0;i<Math.min(5,contest_list.length);i++){
+                estimated_rating+=contest_list[i].newRating
+            }
+            if(contest_list.length!=0){
+                estimated_rating/=Math.min(5,contest_list.length)
+            }
+            estimated_rating = Math.round(estimated_rating)
             display_contest_list()
             $('#display_block').show();
         })
@@ -415,3 +487,45 @@ $(document).ready(function (){
 });
 
 
+
+function drawCharts() {
+
+
+   $('#tags').removeClass('hidden');
+   var tagTable = [];
+   for (var tag in tags) {
+      tagTable.push([tag + ": " + tags[tag], tags[tag]]);
+   }
+   tagTable.sort(function (a, b) {
+      return b[1] - a[1];
+   });
+   tags = new google.visualization.DataTable();
+   tags.addColumn('string', 'Tag');
+   tags.addColumn('number', 'solved');
+   tags.addRows(tagTable);
+   var tagOptions = {
+      width: Math.max(600, $('#tags').width()),
+      height: Math.max(600, $('#tags').width()) * 0.75,
+      chartArea: { width: '80%', height: '100%' },
+      title: 'Tags of ' + handle,
+      pieSliceText: 'none',
+      legend: {
+         position: 'right',
+         alignment: 'center',
+         textStyle: {
+            fontSize: 12,
+            fontName: 'Roboto',
+         }
+      },
+      pieHole: 0.5,
+      tooltip: {
+         text: 'percentage'
+      },
+      fontName: 'Roboto',
+      titleTextStyle: titleTextStyle,
+      colors: colors.slice(0, Math.min(colors.length, tags.getNumberOfRows())),
+   };
+   var tagChart = new google.visualization.PieChart(document.getElementById('tags'));
+   tagChart.draw(tags, tagOptions);
+
+}
