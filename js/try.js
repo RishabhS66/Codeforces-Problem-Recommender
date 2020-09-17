@@ -166,6 +166,7 @@ function RecommendProb(user_handle){
                 if(!ptags.includes(probtag[t])) ptags.push(probtag[t]); // Array containing unique tags attempted by the user. 
                 //  Tags of accepted problem
                 if (res[i].verdict == 'OK'){
+
                     // if(probtag[t]=="combinatorics"){
                     //     console.log(res[i].problem.name+":"+i)
                     // }
@@ -204,6 +205,7 @@ function RecommendProb(user_handle){
     */
 }
 
+
 function capitalize(str)
 {
  return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
@@ -228,6 +230,7 @@ var req4 = $.get(api_url + userinfo, {'handles': handle})
         //rating.innerHTML+="<h3><a>Current Rating: <a/>"+"<violet>"+curr_rating+"<violet/>"+"<br/><a>  Max Rating: <a/>"+maxRating+"<br/>Current Rank: "+curr_rank+"<h3/>";
         //documents.getElementById("max_rating_display").innerHTML = maxRating;
         //documents.getElementById("current_rank_display").innerHTML = curr_rank;
+
         var rating_color = {'newbie':'gray', 'pupil':'green', 'specialist':'cyan', 'expert':'blue', 'candidate master':'violet', 'master':'orange', 'international master': 'orange', 'grandmaster':'red', 'international grandmaster':'red', 'legendary grandmaster':'red'};
 
         $('#rank_display').text(curr_rating)
@@ -434,6 +437,7 @@ function EMH(handle, rating, usersubmits){
 
 
 
+
 function drawCharts() {
 
 
@@ -499,6 +503,7 @@ $(document).ready(function (){
             
                     
             if(data.result.length == 0) {
+
               recent_contests_div.innerHTML = "User has yet to participate in a contest!<br><br>";
              //  Recommend Problems for new user
                 RecommendProb(handle_inp.value);
