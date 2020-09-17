@@ -166,16 +166,12 @@ function RecommendProb(user_handle){
                 if(!ptags.includes(probtag[t])) ptags.push(probtag[t]); // Array containing unique tags attempted by the user. 
                 //  Tags of accepted problem
                 if (res[i].verdict == 'OK'){
-                    if(probtag[t]=="combinatorics"){
-                        console.log(res[i].problem.name+":"+i)
-                    }
+
+                    // if(probtag[t]=="combinatorics"){
+                    //     console.log(res[i].problem.name+":"+i)
+                    // }
                     if (tags[probtag[t]] === undefined) tags[probtag[t]] = 1;
                     else tags[probtag[t]]++;
-                    /*
-                    probtag.forEach(function (t1) {
-                        
-                    });
-                    */
                 }
             }
         }
@@ -209,6 +205,12 @@ function RecommendProb(user_handle){
     */
 }
 
+
+function capitalize(str)
+{
+ return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+
 function tags_n_ratings(handle, ptags, user_prob_set){
 // Function which takes the set of attempted problems, and all the unique tags of problems attempted by user
 console.log("YES!");
@@ -228,9 +230,12 @@ var req4 = $.get(api_url + userinfo, {'handles': handle})
         //rating.innerHTML+="<h3><a>Current Rating: <a/>"+"<violet>"+curr_rating+"<violet/>"+"<br/><a>  Max Rating: <a/>"+maxRating+"<br/>Current Rank: "+curr_rank+"<h3/>";
         //documents.getElementById("max_rating_display").innerHTML = maxRating;
         //documents.getElementById("current_rank_display").innerHTML = curr_rank;
+
+        var rating_color = {'newbie':'gray', 'pupil':'green', 'specialist':'cyan', 'expert':'blue', 'candidate master':'violet', 'master':'orange', 'international master': 'orange', 'grandmaster':'red', 'international grandmaster':'red', 'legendary grandmaster':'red'};
+
         $('#rank_display').text(curr_rating)
         $('#max_rating_display').text(maxRating);
-        $('#current_rank_display').text(curr_rank);
+        $('#current_rank_display').css('color',rating_color[curr_rank]).text(capitalize(curr_rank));
         
   // if the user is new, we define beginner tags and give him a current rating of 800 to give problems 
         if(ptags.length==0 || curr_rating<800)
@@ -433,61 +438,6 @@ function EMH(handle, rating, usersubmits){
 
 
 
-
-
-//-------------------------------------------------Jquery---------------------------------------------------------
-
-$(document).ready(function (){
-    init();
-
-    $('#display_values').click(function (){
-        
-        //alert('HTML: '+$('#handle').val())
-        handle = $('#handle_inp').val()
-        estimated_rating = 0
-        tags = {}
-        user_rating = $.get(api_url + "user.rating", {'handle':handle})
-        .done(function(data,status){
-            $('#alert_message').hide();
-            //console.log(data.result[0])
-            handle_display_div.innerHTML = handle_inp.value;
-            
-                    
-            if(data.result.length == 0) {
-              recent_contests_div.innerHTML = "User has yet to participate in a contest!";
-             //  Recommend Problems for new user
-                       RecommendProb(handle_inp.value);
-         
-            }              
-            else {            
-                //$('#contest_display').text = data.result.length
-                total_contest_div.innerHTML = data.result.length
-                // Since handle is valid, we recommend the user some problems
-                RecommendProb(handle_inp.value);
-            }
-
-            contest_list = data.result.reverse()
-            for(var i=0;i<Math.min(5,contest_list.length);i++){
-                estimated_rating+=contest_list[i].newRating
-            }
-            if(contest_list.length!=0){
-                estimated_rating/=Math.min(5,contest_list.length)
-            }
-            estimated_rating = Math.round(estimated_rating)
-            display_contest_list()
-            $('#display_block').show();
-        })
-        .fail(function(data,status){
-            $('#display_block').hide();
-            $('#alert_message').show();
-            //clear_all();
-            //alert("Handle: "+handle+", does not exist!")
-        })
-    });
-});
-
-
-
 function drawCharts() {
 
 
@@ -529,3 +479,59 @@ function drawCharts() {
    tagChart.draw(tags, tagOptions);
 
 }
+
+
+
+
+
+//-------------------------------------------------Jquery---------------------------------------------------------
+
+$(document).ready(function (){
+    init();
+
+    $('#display_values').click(function (){
+        
+        //alert('HTML: '+$('#handle').val())
+        handle = $('#handle_inp').val()
+        estimated_rating = 0
+        tags = {}
+        user_rating = $.get(api_url + "user.rating", {'handle':handle})
+        .done(function(data,status){
+            $('#alert_message').hide();
+            //console.log(data.result[0])
+            handle_display_div.innerHTML = handle_inp.value;
+            
+                    
+            if(data.result.length == 0) {
+
+              recent_contests_div.innerHTML = "User has yet to participate in a contest!<br><br>";
+             //  Recommend Problems for new user
+                RecommendProb(handle_inp.value);
+         
+            }              
+            else {            
+                //$('#contest_display').text = data.result.length
+                total_contest_div.innerHTML = data.result.length
+                // Since handle is valid, we recommend the user some problems
+                RecommendProb(handle_inp.value);
+            }
+
+            contest_list = data.result.reverse()
+            for(var i=0;i<Math.min(5,contest_list.length);i++){
+                estimated_rating+=contest_list[i].newRating
+            }
+            if(contest_list.length!=0){
+                estimated_rating/=Math.min(5,contest_list.length)
+            }
+            estimated_rating = Math.round(estimated_rating)
+            display_contest_list()
+            $('#display_block').show();
+        })
+        .fail(function(data,status){
+            $('#display_block').hide();
+            $('#alert_message').show();
+            //clear_all();
+            //alert("Handle: "+handle+", does not exist!")
+        })
+    });
+});
