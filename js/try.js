@@ -1,19 +1,15 @@
-var user_rating;
 var contest_list;
 const api_url = "https://codeforces.com/api/";
 const prob = "problemset.problems";
 const userinfo = "user.info";
 const probsubmitted = "user.status";
-var handle_display_div = 'none';
-var recent_contests_div = 'none';
 var problems_div = 'none';
 var rating=  'none';
-var input;
 var ptags=[];
 var levels=[];
 var handle = 'none';
-var total_contest_div;
 var estimated_rating = 0;
+
 // Vars for charts
 var tags = {};
 google.charts.load('current', { 'packages': ['corechart', 'calendar'] });
@@ -21,34 +17,44 @@ var titleTextStyle = {
     fontSize: 18,
     color: '#393939',
     bold: false
- };
+};
 var colors = ['#f44336', '#E91E63', '#9C27B0', '#673AB7', '#2196F3', '#009688',
     '#8BC34A', '#CDDC39', '#FFC107', '#FF9800', '#FF5722', '#795548', '#607D8B', '#E65100',
     '#827717', '#004D40', '#1A237E', '#6200EA', '#3F51B5', '#F50057', '#304FFE', '#b71c1c'];
-var elem1;
+
+//-----------------------------------------------------------------Initialize----------------------------------------------------------------------
 
 function init(){
-    handle_display_div = document.getElementById("handle_display");
-    recent_contests_div = document.getElementById("recent_contests"); 
     problems_div = document.getElementById("problems");
     rating=  document.getElementById("rank_display");
-    input = document.getElementById("handle_inp");
-    total_contest_div = document.getElementById("contest_display");
-    estimated_rating = 0;
-    elem1 = document.getElementById("demo")
 
-    input.addEventListener("keyup", function(event) {
+    document.getElementById("handle_inp").addEventListener("keyup", function(event) {
         // Number 13 is the "Enter" key on the keyboard
         if (event.keyCode === 13) {
         // Cancel the default action, if needed
         event.preventDefault();
         // Trigger the button element with a click
-
         $('#display_values').click();
         }
     });
 }
 
+function initialize(){
+    $('#handle_display').text(handle)
+    $('#Easy').text('')
+    $('#Medium').text('')
+    $('#Hard').text('')
+
+    problems_div.innerHTML='';
+    estimated_rating = 0;
+    tags = {};
+
+    // Initialize
+    $('#rank_display').text("");
+    $('#max_rating_display').text("");
+    $('#max_rank_display').text("");
+    $('#current_rank_display').text("");
+}
 
 //-------------------------------------------------Class---------------------------------------------------------
 
@@ -98,17 +104,48 @@ class Contest{
 
 //-------------------------------------------------Functions---------------------------------------------------------
 
-function initialize(){
-    handle_display_div.innerHTML = '';
-    recent_contests_div.innerHTML = '';
-    problems_div.innerHTML='';
-
-    // Initialize
-    $('#rank_display').text("");
-    $('#max_rating_display').text("");
-    $('#max_rank_display').text("");
-    $('#current_rank_display').text("");
+function easyLow(x){
+    x/=100;
+    var low = -21.2 + (25.5 * Math.exp(-0.02 * x));
+    low*=100;
+    return low;
 }
+
+function easyHigh(x){
+    x/=100;
+    var high = -32.1 + (37.2 * Math.exp(-0.01 * x));
+    high*=100;
+    return high;
+}
+
+function mediumLow(x){
+    x/=100;
+    var low = -38.8 + (44.8 * Math.exp(-0.008 * x));
+    low*=100;
+    return low;
+}
+
+function mediumHigh(x){
+    x/=100;
+    var high = -53.2 + (59.9 * Math.exp(-0.005 * x));
+    high*=100;
+    return high;
+}
+
+function hardLow(x){
+    x/=100;
+    var low = -32.0 + (39.9 * Math.exp(-0.008 * x));
+    low*=100;
+    return low;
+}
+
+function hardHigh(x){
+    x/=100;
+    var high = -30.8 + (39.6 * Math.exp(-0.006 * x));
+    high*=100;
+    return high;
+}
+
 
 function display_problem_list(contestId){
     
@@ -152,14 +189,13 @@ function err_message(msg) {
     problems_div.innerHTML = '';
 }
 
-function RecommendProb(user_handle){
-    var handle = user_handle;
+function RecommendProb(){
     var user_prob_set=[];
     ptags=[];
     
     // Get list of all problems attempted by user
     // Here, attempted problems also include those which are still unsolved
-    var req3 = $.get(api_url + probsubmitted, {'handle':handle}, function(data,status){
+    $.get(api_url + probsubmitted, {'handle':handle}, function(data,status){
         var status1=data["status"];
         if(status!="success" || status1!="OK"){
             err_message("Get your net checked BRO!!");
@@ -189,27 +225,8 @@ function RecommendProb(user_handle){
             drawCharts();
         }
        
-        tags_n_ratings(handle, ptags, user_prob_set);
+        tags_n_ratings(ptags, user_prob_set);
     });
-
-    //Charts
-    /*
-    for (var i = data.result.length - 1; i >= 0; i--) {
-        var sub = data.result[i];
-        var problemId = sub.problem.contestId + '-' + sub.problem.index;
-        if (sub.verdict == 'OK') {
-            // This is probably no entirely correct. because for multiple ac tag count will increase every time
-            sub.problem.tags.forEach(function (t) {
-                if (tags[t] === undefined) tags[t] = 1;
-                else tags[t]++;
-            });
-        }
-    }
-    for (var tag in tags) {
-        // elem1.innerHTML += tag + "<br/>";
-        console.log(tags[tag]);
-    }
-    */
 }
 
 
@@ -219,7 +236,7 @@ function capitalize(str)
         return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
-function tags_n_ratings(handle, ptags, user_prob_set){
+function tags_n_ratings(ptags, user_prob_set){
 // Function which takes the set of attempted problems, and all the unique tags of problems attempted by user
     console.log("YES!");
     var req4 = $.get(api_url + userinfo, {'handles': handle})
@@ -259,7 +276,7 @@ function tags_n_ratings(handle, ptags, user_prob_set){
             estimated_rating = 800;
         }
 
-            EMH(handle,curr_rating, user_prob_set);
+            EMH(curr_rating, user_prob_set);
         // Recommend problems of certain tag
         /*for(var i in ptags){
             UserProb(handle, ptags[i], curr_rating, user_prob_set);
@@ -268,11 +285,11 @@ function tags_n_ratings(handle, ptags, user_prob_set){
     .fail(function(data, status){
         // If it fails due to too frequent calls to the API (error 429), again call it
         //console.clear();
-        tags_n_ratings(handle, ptags, user_prob_set)
+        tags_n_ratings(ptags, user_prob_set)
     });
 }
 
-function UserProb(handle, tagname, rating, usersubmits){
+function UserProb(tagname, rating, usersubmits){
     // Function to print recommended problems of certain tag
     var req2 = $.get(api_url + prob, {'tags': tagname})
     .done(function(data, status) {
@@ -332,11 +349,11 @@ function UserProb(handle, tagname, rating, usersubmits){
     .fail(function(data, status){
         // If it fails due to too frequent calls to the API (error 429), again call it
         //console.clear();
-        UserProb(handle, tagname, rating, usersubmits)
+        UserProb(tagname, rating, usersubmits)
     });
 } 
 
-function EMH(handle, rating, usersubmits){
+function EMH(rating, usersubmits){
     // Function to print recommended problems of all tags
     var req2 = $.get(api_url + prob, {'tags':""})
     .done(function(data, status) {
@@ -353,7 +370,8 @@ function EMH(handle, rating, usersubmits){
         }
        // var pset = data.result.problems //data["result"]["problems"]
         
-        var total_no_prob = Math.min(1000,pset.length);
+        //var total_no_prob = Math.min(1000,pset.length);
+        var total_no_prob = pset.length;
         var set_of_prob = new Set(); // To store and search the problems being recommended
         var get_prob_url = "https://codeforces.com/contest/";
         var not_attempted_prob = [];
@@ -369,11 +387,8 @@ function EMH(handle, rating, usersubmits){
         level=["Easy","Medium","Hard"];
 
         var round_rating = estimated_rating%100
-        if(round_rating<50){
-            round_rating = estimated_rating-round_rating;
-        }else{
-            round_rating = estimated_rating+100-round_rating;
-        }
+        if(round_rating<50) round_rating = estimated_rating-round_rating;
+        else                round_rating = estimated_rating+100-round_rating;
         console.log(estimated_rating)
 
         for(var index in level)
@@ -381,69 +396,59 @@ function EMH(handle, rating, usersubmits){
             var low,high;
             if (index==0)
             {
-                low=round_rating-100;
-                high=round_rating+100;
+                low=easyLow(round_rating)+round_rating;
+                high=easyHigh(round_rating)+round_rating;
             }
             else if(index==1)
             {
-                low= round_rating +101;
-                high=round_rating +300;
+                low=mediumLow(round_rating)+round_rating;
+                high=mediumHigh(round_rating)+round_rating;
             }
             else
             {
-                low= round_rating +301;
-                high=round_rating +500;
+                low=hardLow(round_rating)+round_rating;
+                high=hardHigh(round_rating)+round_rating;
             }
+            //console.log(low)
+            //console.log(high)
+            // Generate five random problems
+            var checks=0;
+            var ctr = 1;
 
-                    // Generate five random problems
-        var checks=0;
-
-        var ctr = 1;
+            var card_div = document.getElementById(level[index])
     
-        while(ctr <= Math.min(3, total_no_prob)){
-            checks+=1;
-            // Sometimes, there may not be even 2 problems with the desired rating requirement, so we have to break the loop forcefully
-            if(checks>1000*total_no_prob){
-            break;
-        }
-            //Generate a random index
-            var idx = Math.floor(Math.random() * total_no_prob);
-            if(!set_of_prob.has(idx) && pset[idx]["rating"] <= high && pset[idx]["rating"] >= low){
-            if(ctr==1){
-                // Only print the heading if at least 1 problem of that rating is found in the problemset!
-                var heading = '<h2 class="recommend"><u><em>' + level[index] + '</em> problems recommended for ' + handle + ' : </u></h2>';
-                problems_div.innerHTML += heading;
+            while(ctr <= Math.min(3, total_no_prob)){
+                checks+=1;
+                // Sometimes, there may not be even 2 problems with the desired rating requirement, so we have to break the loop forcefully
+                if(checks>1000*total_no_prob){
+                break;
             }
-            var problem_url = get_prob_url + pset[idx].contestId.toString() + "/problem/" + pset[idx].index;
-            var problem_name = pset[idx].name;
-            problem_name = problem_name.link(problem_url);
-            problems_div.innerHTML += ctr + ". " + problem_name + " (" + pset[idx].rating + ")<br>";
-            set_of_prob.add(idx);
-            ctr++;
+                //Generate a random index
+                var idx = Math.floor(Math.random() * total_no_prob);
+                if(!set_of_prob.has(idx) && pset[idx]["rating"] <= high && pset[idx]["rating"] >= low){
+                    if(ctr==1){
+                        // Only print the heading if at least 1 problem of that rating is found in the problemset!
+                        var heading = '<h2 class="recommend"><u>' + level[index] + '</u>:</h2>';
+                        card_div.innerHTML += heading;
+                    }
+                    var problem_url = get_prob_url + pset[idx].contestId.toString() + "/problem/" + pset[idx].index;
+                    var problem_name = pset[idx].name;
+                    problem_name = problem_name.link(problem_url);
+                    card_div.innerHTML += ctr + ". " + problem_name + " (" + pset[idx].rating + ")<br>";
+                    set_of_prob.add(idx);
+                    ctr++;
+                }
+            }
         }
-        }
-
-
-
-        }
-
-
-    
     })
     .fail(function(data, status){
         // If it fails due to too frequent calls to the API (error 429), again call it
         //console.clear();
-        EMH(handle, rating, usersubmits)
+        EMH(rating, usersubmits)
     });
 } 
 
-
-
-
-
 function drawCharts() {
-
-
    $('#tags').removeClass('hidden');
    var tagTable = [];
    for (var tag in tags) {
@@ -483,10 +488,6 @@ function drawCharts() {
 
 }
 
-
-
-
-
 //-------------------------------------------------Jquery---------------------------------------------------------
 
 $(document).ready(function (){
@@ -494,45 +495,37 @@ $(document).ready(function (){
 
     $('#display_values').click(function (){
         initialize();
-        //alert('HTML: '+$('#handle').val())
         handle = $('#handle_inp').val()
-        estimated_rating = 0
-        tags = {}
-        //problems_div.innerHTML = ""
-        user_rating = $.get(api_url + "user.rating", {'handle':handle})
+        $.get(api_url + "user.rating", {'handle':handle})
         .done(function(data,status){
-            $('#alert_message').hide();
-            //console.log(data.result[0])
-            handle_display_div.innerHTML = handle_inp.value;
-            total_contest_div.innerHTML = data.result.length;            
-                    
-            if(data.result.length == 0) {
-
-              recent_contests_div.innerHTML = "User has yet to participate in a contest!<br><br>";
-             //  Recommend Problems for new user
-                RecommendProb(handle_inp.value);         
-            }              
-            else {            
-                //$('#contest_display').text = data.result.length
-                // Since handle is valid, we recommend the user some problems
-                RecommendProb(handle_inp.value);
-            }
-
             contest_list = data.result.reverse()
-            for(var i=0;i<Math.min(5,contest_list.length);i++){
-                estimated_rating+=contest_list[i].newRating
-            }
-            if(contest_list.length!=0){
-                estimated_rating/=Math.min(5,contest_list.length)
-            }
-            estimated_rating = Math.round(estimated_rating)
-            display_contest_list()
+
+            $('#alert_message').hide();
             $('#display_block').show();
+            $('#handle_display').text(handle)
+            $('#contest_display').text(contest_list.length) 
+            $('#recm_handle').text(handle)     
+            $('#nocontests').hide()
+            $('#chart').show()
+            $('#chart_error').hide()
+                    
+            if(contest_list.length == 0){
+                $('#recent_contests').text("User has yet to participate in a contest!")   
+                $('#nocontests').show()
+                $('#chart').hide()
+                $('#chart_error').show()
+            }else                            $('#recent_contests').text("")
+
+            for(var i=0;i<Math.min(5,contest_list.length);i++)  estimated_rating+=contest_list[i].newRating
+            if(contest_list.length!=0)  estimated_rating/=Math.min(5,contest_list.length)
+            estimated_rating = Math.round(estimated_rating)
+            
+            RecommendProb();  
+            display_contest_list()
         })
         .fail(function(data,status){
             $('#display_block').hide();
             $('#alert_message').show();
-            //alert("Handle: "+handle+", does not exist!")
         })
     });
 });
