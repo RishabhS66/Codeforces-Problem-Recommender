@@ -11,7 +11,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-    <script src="js/try.js"></script>
+    <script src="js/main.js"></script>
     <link rel="stylesheet" href="css/master.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
         <div class="row handleblock">
             <div class="col-sm-4"></div>
             <div class="col-sm-4 form-group">
-                <input type="text" class="form-control" placeholder="Enter Codeforces handle" id="handle_inp">
+                <input type="text" class="form-control" placeholder="Enter Codeforces handle" id="handle_inp" autofocus>
             </div>
             <div class="col-sm-2"><button type="submit" class="btn btn-primary" id="display_values">Go</button></div>
         </div>
@@ -38,20 +38,24 @@
                             <br>
                             <div><b>Current Rating:</b> <p id = "rank_display"></p></div>
                             <br>
-                            <div><b>Max Rating:</b> <p id = "max_rating_display"></p></div>
+                            <div><b>Max Rating:</b> <p id = "max_rating_display"></p> <span class="badge" id = "max_rank_display"></span></div>
                             <br>
-                            <div><b>Current Rank:</b> <p id = "current_rank_display"></p></div>
+                            <!-- <div><b>Current Rank:</b> <p id = "current_rank_display"></p><span class="badge">New</span></div> -->
+                            <div><b>Current Rank:</b> <span class="badge" id = "current_rank_display"></span></div>
                             <br>
-                            <div id = "recent_contests"></div>
                             <div><b>Contests:</b> <p id="contest_display"></p></div>
                             <br>
+                            <div class="text-danger" id = "recent_contests"></div>
                         </div>
                     </div>
         
                     <div class="col-sm-6">
-                        <div class="container">
+                        <div class="container" id="chart">
                             <div id="tags" class="hidden to-clear to-hide mdl-shadow--2dp mdl-cell mdl-cell--8-col mdl-cell--8-col-desktop">
                             </div>
+                        </div>
+                        <div class="container" id="chart_error">
+                            <div></div>
                         </div>
                     </div>
                 </div>
@@ -64,14 +68,37 @@
 
 
         <div class="row">
+            <div id="problems"></div>
             <div class="col-sm-6">
-                <div class="container">
-                    <div id = "problems"></div>
+                <div class="container block">
+                    <h3 class="text-center">Recommended Problems for <p id="recm_handle"></p></h3>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card recommendations">
+                                <div id="Easy"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card recommendations">
+                                <div id="Medium"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card recommendations">
+                                <div id="Hard"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-sm-6">
-                <div class="container" id="block">
-                    <h3>Your Recent Contests</h3>
+                <div class="container block">
+                    <h3 class="text-center">Recent Contests</h3>
+                    <div class="text-danger text-center" id="nocontests"> <br> No Contest History!</div>
                     <div class="container recent">
                         <ul class="list-group list-group-flush" id="contestlist">
                             <li class="list-group-item">
@@ -82,6 +109,8 @@
             </div>
         </div>
     </div>
+
+    <div style="margin:20px"></div>
 
 
 

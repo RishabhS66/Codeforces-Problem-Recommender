@@ -17,7 +17,7 @@ p {
     margin: 1em;
 }   
 
-#block{
+.block{
     margin-top: 20px;
     /*display: none;*/
 }
@@ -53,4 +53,9 @@ tr{
 #alert_message{
     display: none;
     color: red;
+}
+
+.recommendations{
+    margin-top: 20px;
+    padding: 10px;
 }
