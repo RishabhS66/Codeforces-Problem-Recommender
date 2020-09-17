@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codeforces Analyzer</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script src="js/try.js"></script>
+    <link rel="stylesheet" href="css/master.css">
+</head>
+<body>
+    <div class="container head">
+        <h2 class="text-center codeforces">CF Problem Recommender</h2>
+        <div class="row handleblock">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4 form-group">
+                <input type="text" class="form-control" placeholder="Enter Codeforces handle" id="handle_inp">
+            </div>
+            <div class="col-sm-2"><button type="submit" class="btn btn-primary" id="display_values">Go</button></div>
+        </div>
+    </div>
+
+    <div class="container text-center" id="alert_message">Handle does not exist!</div>
+
+    <div class="container" id="display_block">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-5">
+                        <div class="container">
+                            <h3>Statistics for: <p id = "handle_display"></p></h3>
+                            <br>
+                            <div><b>Current Rating:</b> <p id = "rank_display"></p></div>
+                            <br>
+                            <div><b>Max Rating:</b> <p id = "max_rating_display"></p></div>
+                            <br>
+                            <div><b>Current Rank:</b> <p id = "current_rank_display"></p></div>
+                            <br>
+                            <div id = "recent_contests"></div>
+                            <div><b>Contests:</b> <p id="contest_display"></p></div>
+                            <br>
+                        </div>
+                    </div>
+        
+                    <div class="col-sm-6">
+                        <div class="container">
+                            <div id="tags" class="hidden to-clear to-hide mdl-shadow--2dp mdl-cell mdl-cell--8-col mdl-cell--8-col-desktop">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+
+
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="container">
+                    <div id = "problems"></div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="container" id="block">
+                    <h3>Your Recent Contests</h3>
+                    <div class="container recent">
+                        <ul class="list-group list-group-flush" id="contestlist">
+                            <li class="list-group-item">
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</body>
+</html>
