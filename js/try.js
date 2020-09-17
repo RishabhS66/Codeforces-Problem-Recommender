@@ -44,15 +44,11 @@ function init(){
         event.preventDefault();
         // Trigger the button element with a click
 
-        // Clear any data present before
-        handle_display_div.innerHTML = '';
-        recent_contests_div.innerHTML = '';
-        problems_div.innerHTML='';  
-        //document.getElementById("display_values").click();
         $('#display_values').click();
         }
     });
 }
+
 
 //-------------------------------------------------Class---------------------------------------------------------
 
@@ -101,6 +97,18 @@ class Contest{
 }
 
 //-------------------------------------------------Functions---------------------------------------------------------
+
+function initialize(){
+    handle_display_div.innerHTML = '';
+    recent_contests_div.innerHTML = '';
+    problems_div.innerHTML='';
+
+    // Initialize
+    $('#rank_display').text("");
+    $('#max_rating_display').text("");
+    $('#max_rank_display').text("");
+    $('#current_rank_display').text("");
+}
 
 function display_problem_list(contestId){
     
@@ -189,7 +197,6 @@ function RecommendProb(user_handle){
     for (var i = data.result.length - 1; i >= 0; i--) {
         var sub = data.result[i];
         var problemId = sub.problem.contestId + '-' + sub.problem.index;
-
         if (sub.verdict == 'OK') {
             // This is probably no entirely correct. because for multiple ac tag count will increase every time
             sub.problem.tags.forEach(function (t) {
@@ -208,13 +215,14 @@ function RecommendProb(user_handle){
 
 function capitalize(str)
 {
- return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+    if(str)
+        return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
 function tags_n_ratings(handle, ptags, user_prob_set){
 // Function which takes the set of attempted problems, and all the unique tags of problems attempted by user
-console.log("YES!");
-var req4 = $.get(api_url + userinfo, {'handles': handle})
+    console.log("YES!");
+    var req4 = $.get(api_url + userinfo, {'handles': handle})
     .done(function(data, status) {
         var status1=data["status"];
         if(status!="success" || status1!="OK"){
@@ -226,16 +234,22 @@ var req4 = $.get(api_url + userinfo, {'handles': handle})
         var curr_rating=data.result[0]["rating"];
         var curr_rank=data.result[0]["rank"];
         var maxRating=data.result[0]["maxRating"];
+        var max_rank = data.result[0]["maxRank"];
         rating.innerHTML = '';
-        //rating.innerHTML+="<h3><a>Current Rating: <a/>"+"<violet>"+curr_rating+"<violet/>"+"<br/><a>  Max Rating: <a/>"+maxRating+"<br/>Current Rank: "+curr_rank+"<h3/>";
-        //documents.getElementById("max_rating_display").innerHTML = maxRating;
-        //documents.getElementById("current_rank_display").innerHTML = curr_rank;
 
         var rating_color = {'newbie':'gray', 'pupil':'green', 'specialist':'cyan', 'expert':'blue', 'candidate master':'violet', 'master':'orange', 'international master': 'orange', 'grandmaster':'red', 'international grandmaster':'red', 'legendary grandmaster':'red'};
-
-        $('#rank_display').text(curr_rating)
-        $('#max_rating_display').text(maxRating);
-        $('#current_rank_display').css('color',rating_color[curr_rank]).text(capitalize(curr_rank));
+        
+        if(contest_list.length==0){
+            $('#rank_display').css('color',rating_color[curr_rank]).text("NA");
+            $('#max_rating_display').css('color',rating_color[max_rank]).text("NA");
+            $('#max_rank_display').css('color',rating_color[max_rank]).text("");
+            $('#current_rank_display').css('color',rating_color[curr_rank]).text("Not yet defined");  
+        }else{
+            $('#rank_display').css('color',rating_color[curr_rank]).text(curr_rating);
+            $('#max_rating_display').css('color',rating_color[max_rank]).text(maxRating);
+            $('#max_rank_display').css('color',rating_color[max_rank]).text("("+capitalize(max_rank)+")");
+            $('#current_rank_display').css('color',rating_color[curr_rank]).text(capitalize(curr_rank));
+        }
         
   // if the user is new, we define beginner tags and give him a current rating of 800 to give problems 
         if(ptags.length==0 || curr_rating<800)
@@ -321,17 +335,6 @@ function UserProb(handle, tagname, rating, usersubmits){
         UserProb(handle, tagname, rating, usersubmits)
     });
 } 
-
-function clear_all(){
-    handle_display_div.innerHTML = '';
-    recent_contests_div.innerHTML = '';
-    handle_inp.value = '';
-    problems_div.innerHTML='';
-    total_contest_div.innerHTML = '';
-    document.getElementById("block").innerHTML = "";
-}
-
-
 
 function EMH(handle, rating, usersubmits){
     // Function to print recommended problems of all tags
@@ -490,28 +493,27 @@ $(document).ready(function (){
     init();
 
     $('#display_values').click(function (){
-        
+        initialize();
         //alert('HTML: '+$('#handle').val())
         handle = $('#handle_inp').val()
         estimated_rating = 0
         tags = {}
+        //problems_div.innerHTML = ""
         user_rating = $.get(api_url + "user.rating", {'handle':handle})
         .done(function(data,status){
             $('#alert_message').hide();
             //console.log(data.result[0])
             handle_display_div.innerHTML = handle_inp.value;
-            
+            total_contest_div.innerHTML = data.result.length;            
                     
             if(data.result.length == 0) {
 
               recent_contests_div.innerHTML = "User has yet to participate in a contest!<br><br>";
              //  Recommend Problems for new user
-                RecommendProb(handle_inp.value);
-         
+                RecommendProb(handle_inp.value);         
             }              
             else {            
                 //$('#contest_display').text = data.result.length
-                total_contest_div.innerHTML = data.result.length
                 // Since handle is valid, we recommend the user some problems
                 RecommendProb(handle_inp.value);
             }
@@ -530,7 +532,6 @@ $(document).ready(function (){
         .fail(function(data,status){
             $('#display_block').hide();
             $('#alert_message').show();
-            //clear_all();
             //alert("Handle: "+handle+", does not exist!")
         })
     });
