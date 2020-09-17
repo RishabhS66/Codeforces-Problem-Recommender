@@ -162,6 +162,7 @@ function display_problem_list(contestId){
         
     })
     .fail(function(data,status){
+        console.clear()
         display_problem_list(contestId)
     })
 }
@@ -238,7 +239,6 @@ function capitalize(str)
 
 function tags_n_ratings(ptags, user_prob_set){
 // Function which takes the set of attempted problems, and all the unique tags of problems attempted by user
-    console.log("YES!");
     var req4 = $.get(api_url + userinfo, {'handles': handle})
     .done(function(data, status) {
         var status1=data["status"];
@@ -284,7 +284,7 @@ function tags_n_ratings(ptags, user_prob_set){
     })
     .fail(function(data, status){
         // If it fails due to too frequent calls to the API (error 429), again call it
-        //console.clear();
+        console.clear();
         tags_n_ratings(ptags, user_prob_set)
     });
 }
@@ -348,7 +348,7 @@ function UserProb(tagname, rating, usersubmits){
     })
     .fail(function(data, status){
         // If it fails due to too frequent calls to the API (error 429), again call it
-        //console.clear();
+        console.clear();
         UserProb(tagname, rating, usersubmits)
     });
 } 
@@ -389,7 +389,6 @@ function EMH(rating, usersubmits){
         var round_rating = estimated_rating%100
         if(round_rating<50) round_rating = estimated_rating-round_rating;
         else                round_rating = estimated_rating+100-round_rating;
-        console.log(estimated_rating)
 
         for(var index in level)
         {
@@ -409,8 +408,7 @@ function EMH(rating, usersubmits){
                 low=hardLow(round_rating)+round_rating;
                 high=hardHigh(round_rating)+round_rating;
             }
-            //console.log(low)
-            //console.log(high)
+
             // Generate five random problems
             var checks=0;
             var ctr = 1;
@@ -443,7 +441,7 @@ function EMH(rating, usersubmits){
     })
     .fail(function(data, status){
         // If it fails due to too frequent calls to the API (error 429), again call it
-        //console.clear();
+        console.clear();
         EMH(rating, usersubmits)
     });
 } 
