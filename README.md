@@ -8,6 +8,16 @@ Often, users find it difficult to choose unsolved problems to solve for practice
 
 This repository includes all the codes which the website uses. The website can be accessed at http://cfprobrecom.byethost8.com.
 
+## Logic for Problem Recommendation
+After some mathematical analysis and curve fitting, the authors derived the following equations to determine the acceptable range of ratings for the problems recommended in each category.
+<div align = "center">
+  <img src = "https://user-images.githubusercontent.com/39689610/117701922-71372a80-b1e5-11eb-873c-08aaee9b3c02.png" width = "600" height = "173">
+ </div>
+ <br>
+
+The problems that are unsolved by the user, and also satisfy the above constraints, are pooled together. Problems from these pools are then chosen randomly to be displayed to the user.
+
+
 ## Demonstration
 1. Open the <a href = "http://cfprobrecom.byethost8.com/">website</a>, and enter your codeforces user handle.
 <div align = "center">
