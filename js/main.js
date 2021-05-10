@@ -171,7 +171,7 @@ function display_contest_list(){
     var x,count = 0;
     $('#contestlist *').remove()
     for (x of contest_list){
-        if(++count>5)   break;
+        if(++count>3)   break;
         $('#contestlist').append('<div class="card">'+
                                     '<div class="card-body">'+
                                         '<h4><a href="https://codeforces.com/contest/'+x.contestId+'">'+x.contestName+'</a></h4>'+
@@ -182,6 +182,27 @@ function display_contest_list(){
                                     '</div>'+
                                 '</div>');
         display_problem_list(x.contestId);
+    }
+    if(contest_list.length>3){
+        $('#view_more').show();
+    }
+}
+
+function view_more_fun(){
+    var x,count = 0;
+    for (x of contest_list){
+        if(++count>3){
+            $('#contestlist').append('<div class="card">'+
+                                        '<div class="card-body">'+
+                                            '<h4><a href="https://codeforces.com/contest/'+x.contestId+'">'+x.contestName+'</a></h4>'+
+                                            '<table class="table table-bordered">'+
+                                                '<tbody id="'+x.contestId+'">'+
+                                                '</tbody>'+
+                                            '</table>'+
+                                        '</div>'+
+                                    '</div>');
+            display_problem_list(x.contestId);
+        }
     }
 }
 
@@ -257,10 +278,10 @@ function tags_n_ratings(ptags, user_prob_set){
         var rating_color = {'newbie':'gray', 'pupil':'green', 'specialist':'cyan', 'expert':'blue', 'candidate master':'violet', 'master':'orange', 'international master': 'orange', 'grandmaster':'red', 'international grandmaster':'red', 'legendary grandmaster':'red'};
         
         if(contest_list.length==0){
-            $('#rank_display').css('color',rating_color[curr_rank]).text("NA");
-            $('#max_rating_display').css('color',rating_color[max_rank]).text("NA");
-            $('#max_rank_display').css('color',rating_color[max_rank]).text("");
-            $('#current_rank_display').css('color',rating_color[curr_rank]).text("Not yet defined");  
+            $('#rank_display').css('color','black').text("NA");
+            $('#max_rating_display').css('color','black').text("NA");
+            $('#max_rank_display').css('color','black').text("");
+            $('#current_rank_display').css('color','black').text("Not yet defined");  
         }else{
             $('#rank_display').css('color',rating_color[curr_rank]).text(curr_rating);
             $('#max_rating_display').css('color',rating_color[max_rank]).text(maxRating);
@@ -269,7 +290,7 @@ function tags_n_ratings(ptags, user_prob_set){
         }
         
   // if the user is new, we define beginner tags and give him a current rating of 800 to give problems 
-        if(ptags.length==0 || curr_rating<800)
+        if(ptags.length==0 || curr_rating<800 || curr_rating==undefined)
         {
             ptags=["math","greedy","sortings","brute force","implementation"];
             curr_rating =800;
@@ -415,7 +436,7 @@ function EMH(rating, usersubmits){
 
             var card_div = document.getElementById(level[index])
     
-            while(ctr <= Math.min(3, total_no_prob)){
+            while(ctr <= Math.min(5, total_no_prob)){
                 checks+=1;
                 // Sometimes, there may not be even 2 problems with the desired rating requirement, so we have to break the loop forcefully
                 if(checks>1000*total_no_prob){
@@ -526,4 +547,9 @@ $(document).ready(function (){
             $('#alert_message').show();
         })
     });
+
+    $('#view_more').click(function(){
+        view_more_fun();
+        $('#view_more').hide()
+    })
 });
