@@ -17,7 +17,7 @@ This repository includes all the codes which the website uses. The website can b
  </div>
  <br>
  
- 2. Click the **GO** button, or press _Enter_. You will see the **user statistics**, **recommended problems** in all 3 categories, and a list of **recent contests** that the user has participated in on Codeforces.
+ 2. Click the **Go** button, or press _Enter_. You will see the **user statistics**, **recommended problems** in all 3 categories, and a list of **recent contests** that the user has participated in on Codeforces.
 <div align = "center">
   <kbd>
     <img src = "https://user-images.githubusercontent.com/39689610/117656417-f3a7f600-b1b5-11eb-881c-f55362ae1ab2.png">
