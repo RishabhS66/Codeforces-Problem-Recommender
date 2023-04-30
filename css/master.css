@@ -87,3 +87,7 @@ h2.codeforces {
 .form-control {
     margin-right: 10px;
 }
+
+span.badge {
+    font-size: 1rem;
+}
