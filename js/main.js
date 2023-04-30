@@ -259,7 +259,7 @@ function capitalize(str) {
 
 function tags_n_ratings(ptags, user_prob_set) {
     // Function which takes the set of attempted problems, and all the unique tags of problems attempted by user
-    var req4 = $.get(api_url + userinfo, { 'handles': handle })
+    var req4 = $.get(api_url + userinfo, { 'handles': handle , 'lang': 'en'})
         .done(function (data, status) {
             var status1 = data["status"];
             if (status != "success" || status1 != "OK") {
@@ -274,7 +274,7 @@ function tags_n_ratings(ptags, user_prob_set) {
             var max_rank = data.result[0]["maxRank"];
             rating.innerHTML = '';
 
-            var rating_color = { 'newbie': 'gray', 'pupil': 'green', 'specialist': 'cyan', 'expert': 'blue', 'candidate master': 'violet', 'master': 'orange', 'international master': 'orange', 'grandmaster': 'red', 'international grandmaster': 'red', 'legendary grandmaster': 'red' };
+            var rating_color = { 'newbie': 'gray', 'pupil': 'green', 'specialist': '#03a89e', 'expert': 'blue', 'candidate master': 'violet', 'master': 'orange', 'international master': 'orange', 'grandmaster': 'red', 'international grandmaster': 'red', 'legendary grandmaster': 'red' };
 
             if (contest_list.length == 0) {
                 $('#rank_display').css('color', 'black').text("NA");
@@ -285,7 +285,7 @@ function tags_n_ratings(ptags, user_prob_set) {
                 $('#rank_display').css('color', rating_color[curr_rank]).text(curr_rating);
                 $('#max_rating_display').css('color', rating_color[max_rank]).text(maxRating);
                 $('#max_rank_display').css('color', rating_color[max_rank]).text("(" + capitalize(max_rank) + ")");
-                $('#current_rank_display').css('color', rating_color[curr_rank]).text(capitalize(curr_rank));
+                $('#current_rank_display').css('color', rating_color[curr_rank]).text("(" + capitalize(curr_rank) + ")");
             }
 
             // if the user is new, we define beginner tags and give him a current rating of 800 to give problems 
