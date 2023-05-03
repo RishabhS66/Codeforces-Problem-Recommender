@@ -6,6 +6,9 @@
     <title>Codeforces Analyzer</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -14,19 +17,21 @@
     <script src="js/main.js"></script>
     <link rel="stylesheet" href="css/master.css">
 </head>
+
 <body>
     <div class="container head">
         <h2 class="text-center codeforces">CF Problem Recommender</h2>
         <div class="row handleblock">
-            <div class="col-sm-4"></div>
-            <div class="col-sm-4 form-group">
+            <div class="col-sm-3"></div>
+            <div class="form-group">
                 <input type="text" class="form-control" placeholder="Enter Codeforces handle" id="handle_inp" autofocus>
+                <button type="submit" class="btn btn-primary" id="display_values">Go</button>
             </div>
-            <div class="col-sm-2"><button type="submit" class="btn btn-primary" id="display_values">Go</button></div>
+            <div class="col-sm-3"></div>
         </div>
     </div>
 
-    <div class="container text-center" id="alert_message">Handle does not exist!</div>
+    <div class="container text-center" id="alert_message">Couldn't fetch data for the user. Check the handle or try again later.</div>
 
     <div class="container" id="display_block">
         <div class="card">
@@ -34,16 +39,15 @@
                 <div class="row">
                     <div class="col-sm-5">
                         <div class="container">
-                            <h3>Statistics for: <p id = "handle_display"></p></h3>
+                            <h3>Statistics for <p id = "handle_display"></p></h3>
                             <br>
-                            <div><b>Current Rating:</b> <p id = "rank_display"></p></div>
+                            <div><b>Current Rating:</b> <p id = "rank_display"></p><span class="badge" id = "current_rank_display"></span></div>
                             <br>
-                            <div><b>Max Rating:</b> <p id = "max_rating_display"></p> <span class="badge" id = "max_rank_display"></span></div>
+                            <div><b>Max Rating:</b> <p id = "max_rating_display"></p><span class="badge" id = "max_rank_display"></span></div>
                             <br>
                             <!-- <div><b>Current Rank:</b> <p id = "current_rank_display"></p><span class="badge">New</span></div> -->
-                            <div><b>Current Rank:</b> <span class="badge" id = "current_rank_display"></span></div>
-                            <br>
-                            <div><b>Contests:</b> <p id="contest_display"></p></div>
+                            
+                            <div><b>Contests completed:</b> <p id="contest_display"></p></div>
                             <br>
                             <div class="text-danger" id = "recent_contests"></div>
                         </div>
@@ -62,10 +66,6 @@
             </div>
         </div>
         
-
-
-
-
 
         <div class="row">
             <div id="problems"></div>
@@ -95,10 +95,11 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-sm-6">
                 <div class="container block">
                     <h3 class="text-center">Recent Contests</h3>
-                    <div class="text-danger text-center" id="nocontests"> <br> No Contest History!</div>
+                    <div class="text-danger text-center" id="nocontests"> <br> No contest history!</div>
                     <div class="container recent">
                         <ul class="list-group list-group-flush" id="contestlist">
                             <li class="list-group-item">
@@ -111,7 +112,6 @@
     </div>
 
     <div style="margin:20px"></div>
-
 
 
 </body>

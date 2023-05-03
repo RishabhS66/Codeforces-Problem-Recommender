@@ -1,61 +1,93 @@
-.head{
-    margin-top: 10px;
-    background-color: #D8D6D5;
+body {
+    font-family: 'Nunito', sans-serif;
 }
 
-.head h2{
+.head {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    background-color: #D8D6D5;
+    border-radius: 5px;
+}
+
+.head h2 {
     color: #0c225e;
     font-size: 35px;
 }
-
 
 p {
     display: inline;
 }
 
-.handleblock{
-    margin: 1em;
-}   
+.handleblock {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin: 0;
+}
 
-.block{
+.block {
     margin-top: 20px;
     /*display: none;*/
 }
 
-.recent{
+.recent {
     height: 100%;
 }
 
-#display_block{
+#display_block {
     display: none;
 }
 
-.accepted{
+.accepted {
     color: green;
 }
 
-.failed{
+.failed {
     color: red;
 }
 
-.accepted, .failed, .notattempted{
+.accepted, .failed, .notattempted {
     font-size: 10px;
 }
 
-tr{
+tr {
     height: 10px;
 }
 
-.recommend{
+.recommend {
     font-size: 20px;
 }
 
-#alert_message{
+#alert_message {
     display: none;
     color: red;
 }
 
-.recommendations{
+.recommendations {
     margin-top: 20px;
     padding: 10px;
+}
+
+.card {
+    margin-top: 20px;
+}
+
+h2.codeforces {
+    margin-top: 8px !important;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 40%;
+}
+
+.form-control {
+    margin-right: 10px;
+}
+
+span.badge {
+    font-size: 1rem;
 }
